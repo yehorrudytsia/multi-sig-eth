@@ -309,8 +309,14 @@ module.exports = {
   },
   namedAccounts: {
     deployer: {
-      default: 0, // here this will by default take the first account as deployer
+      default: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266', // here this will by default take the first account as deployer
     },
+    owner1: {
+      default: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+    }, 
+    owner2: {
+      default: '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
+    }
   },
   etherscan: {
     apiKey: "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW",
