@@ -9,6 +9,12 @@ contract MultiSig {
   uint public confirmationsRequired;
   mapping (address => bool) public isOwner;
 
+  event SubmitTX(
+    address indexed owner, uint indexed txIndex, address indexed to, uint value, bytes data
+  );
+  event ConfirmTX(address indexed owner, uint indexed txIndex);
+  event ExecuteTX(address indexed owner, uint indexed txIndex);
+  event RecieveFunds(address indexed sender, uint amount, uint balance);
 
   struct Transaction {
     address to;
@@ -52,7 +58,9 @@ contract MultiSig {
     confirmationsRequired = _confirmationsRequired;
   }
 
-  function deposit() external payable {}
+  function deposit() external payable {
+    emit RecieveFunds(msg.sender, msg.value, address(this).balance);
+  }
   receive() external payable {}
 
   function submitTX (address _to, uint _value, bytes memory _data) public onlyOwner {
@@ -65,6 +73,8 @@ contract MultiSig {
     });
     
     transactions.push(Tx);
+
+    emit SubmitTX(msg.sender, transactions.length, _to, _value, _data);
   }
 
   function confirmTX (uint _index) 
@@ -75,6 +85,8 @@ contract MultiSig {
   {
     confirmedTXs[_index][msg.sender] = true;
     transactions[_index].confirmations++;
+
+    emit ConfirmTX(msg.sender, _index);
   }
 
   function executeTX (uint _index)
@@ -91,7 +103,9 @@ contract MultiSig {
     (bool success, ) = transactions[_index]
       .to
       .call {value: transactions[_index].value} (transactions[_index].data);
-    require(success, "TX failed");  
+    require(success, "TX failed"); 
+
+    emit ExecuteTX(msg.sender, _index); 
   }
 
   function getOwners () public view returns(address[] memory) {
