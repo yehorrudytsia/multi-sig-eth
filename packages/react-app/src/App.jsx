@@ -167,7 +167,7 @@ function App(props) {
   ]);
 
   // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  const purpose = useContractReader(readContracts, "MultiSig", "owners");
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -285,7 +285,7 @@ function App(props) {
             */}
 
           <Contract
-            name="YourContract"
+            name="MultiSig"
             price={price}
             signer={userSigner}
             provider={localProvider}
