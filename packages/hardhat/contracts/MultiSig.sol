@@ -36,6 +36,7 @@ contract MultiSig {
     _;
   }
 
+
   constructor(address[] memory _owners, uint _confirmationsRequired) {
     require(_owners.length > 1, "at least 2 owners required to initialize the multisig wallet");
 
@@ -52,6 +53,7 @@ contract MultiSig {
   }
 
   function deposit() external payable {}
+  receive() external payable {}
 
   function submitTX (address _to, uint _value, bytes memory _data) public onlyOwner {
     Transaction memory Tx = Transaction({
@@ -73,8 +75,6 @@ contract MultiSig {
   {
     confirmedTXs[_index][msg.sender] = true;
     transactions[_index].confirmations++;
-
-    
   }
 
   function executeTX (uint _index)
@@ -84,12 +84,13 @@ contract MultiSig {
   {
     require((_index < transactions.length), "TX with given index is not exist");
     require(transactions[_index].confirmations >= confirmationsRequired, 
-    "not enough confirmations for given TX");
+      "not enough confirmations for given TX"
+    );
     
     transactions[_index].executed = true;
-    (bool success, ) = transactions[_index].to.call {
-      value: transactions[_index].value
-    } (transactions[_index].data);
+    (bool success, ) = transactions[_index]
+      .to
+      .call {value: transactions[_index].value} (transactions[_index].data);
     require(success, "TX failed");  
   }
 
@@ -101,7 +102,7 @@ contract MultiSig {
     address to, uint value, bool executed, uint confirmations)
   {
     Transaction storage Tx = transactions[_index];
-        return (Tx.to, Tx.value, Tx.executed, Tx.confirmations);
+    return (Tx.to, Tx.value, Tx.executed, Tx.confirmations);
   }
 }
 
